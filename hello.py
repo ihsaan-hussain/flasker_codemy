@@ -2,13 +2,17 @@ from flask import Flask, render_template, flash
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
+
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 # Create A Flask Instance
 app = Flask(__name__)
 # Add Database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+# Olda Sqlite Database
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:2009ih43@localhost/our_users'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:2009ih43@localhost/our_users'
 # Secret Key!
 app.config['SECRET_KEY'] = "1234"
 # Initialize the Database
