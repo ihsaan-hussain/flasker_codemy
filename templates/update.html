@@ -19,7 +19,7 @@
 
 {% for our_user in our_users %}
 	<tr>
-	<td>{{ our_user.id }}. {{ our_user.name }} - {{ our_user.email }}</td>
+	<td>{{ our_user.id }}. {{ our_user.name }} - {{ our_user.email }} - {{ our_user.favourite_color }}</td>
 	</tr>
 {% endfor %}
 </table>
@@ -39,6 +39,13 @@
 		{{ form.email.label(class="form-label") }}
 
 		{{ form.email(class="form-control", value=name_to_update.email) }}
+		<br/>
+
+		{{ form.favourite_color.label(class="form-label") }}
+
+		{{ form.favourite_color(class="form-control", value=name_to_update.favourite_color) }}
+
+
 		<br/>
 		
 		{{ form.submit(class="btn btn-secondary") }}
