@@ -11,12 +11,7 @@
 
 {% endfor %}
 
-{% for our_user in our_users %}
-	<tr>
-	<td>{{ our_user.id }}. <a href="{{url_for('update', id=our_user.id)}}"> {{ our_user.name }}</a> - {{ our_user.email }} - {{ our_user.favourite_color }} - <a href="{{url_for('delete', id=our_user.id)}}">Delete</a></td>
-	</tr>
-{% endfor %}
-</table>
+{% if current_user.is_authenticated %}
 
 <h1>Add Blog Post...</h1>
 	<br/>
@@ -49,7 +44,13 @@
 
 	</form>
 </div>
+{% else %}
+<h2>Must Be Logged In...</h2>
+<p>Sorry, you must be loggrd in to access this page!</p>
 
+{% endif %}
+
+<a href="{{ url_for('login') }}">Login Here</a>
 
 
 {% endblock %}
