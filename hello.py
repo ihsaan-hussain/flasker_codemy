@@ -122,7 +122,6 @@ def edit_post(id):
 	form = PostForm()
 	if form.validate_on_submit():
 		post.title = form.title.data
-		post.author = form.author.data
 		post.slug = form.slug.data
 		post.content = form.content.data
 		# update database
@@ -131,7 +130,6 @@ def edit_post(id):
 		flash("Post has been updated")
 		return redirect(url_for('post', id=post.id))
 	form.title.data = post.title
-	form.author.data = post.author
 	form.slug.data = post.slug
 	form.content.data = post.content
 	return render_template('edit_post.html', form=form)
@@ -143,11 +141,11 @@ def add_post():
 	form = PostForm()
 
 	if form.validate_on_submit():
-		post = Posts(title=form.title.data, content=form.content.data, author=form.author.data, slug=form.slug.data)
+		poster = current_user.id
+		post = Posts(title=form.title.data, content=form.content.data, poster_id=poster, slug=form.slug.data)
 		# Clear the form
 		form.title.data = ''
 		form.content.data = ''
-		form.author.data = ''
 		form.slug.data = ''
 
 		# Add post data to database
@@ -341,9 +339,11 @@ class Posts(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	title = db.Column(db.String(255))
 	content = db.Column(db.Text)
-	author = db.Column(db.String(255))
+	#author = db.Column(db.String(255))
 	date_poseted = db.Column(db.DateTime, default=datetime.utcnow)
 	slug = db.Column(db.String(255))
+	# Foriegn Key To Link Users (refer to primakry key of the user)
+	poster_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 # Create Model
 class Users(db.Model, UserMixin):
@@ -355,6 +355,8 @@ class Users(db.Model, UserMixin):
 	date_added = db.Column(db.DateTime, default=datetime.utcnow)
 	# Do Some Password Stuff
 	password_hash = db.Column(db.String(128))
+	# User Can Have Many Posts
+	posts = db.relationship('Posts', backref='poster')
 
 
 	@property
