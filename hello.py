@@ -83,25 +83,33 @@ def dashboard():
 
 
 @app.route('/posts/delete/<int:id>')
+@login_required
 def delete_post(id):
-	post_to_delte = Posts.query.get_or_404(id)
+	post_to_delete = Posts.query.get_or_404(id)
+	id = current_user.id
+	if id == post_to_delete.poster.id:
+		try:
+			db.session.delete(post_to_delete)
+			db.session.commit()
 
-	try:
-		db.session.delete(post_to_delte)
-		db.session.commit()
-
-		# Return a message
-		flash('Post has been deleted')
+			# Return a message
+			flash('Post has been deleted')
 		
-		# Grab all the posts from the database
-		posts = Posts.query.order_by(Posts.date_poseted)
-		return render_template("posts.html", posts=posts)
+			# Grab all the posts from the database
+			posts = Posts.query.order_by(Posts.date_poseted)
+			return render_template("posts.html", posts=posts)
 	
 
-	except:
-		# return an error message
-		flash("Whops! there was a problem deleting post try again...")
-
+		except:
+			# return an error message
+			flash("Whops! there was a problem deleting post try again...")
+	else:
+		# Return a message
+			flash("You Aren't Authourised To Delete That Post!")
+		
+			# Grab all the posts from the database
+			posts = Posts.query.order_by(Posts.date_poseted)
+			return render_template("posts.html", posts=posts)
 
 @app.route('/posts')
 def posts():
@@ -128,11 +136,17 @@ def edit_post(id):
 		db.session.add(post)
 		db.session.commit()
 		flash("Post has been updated")
-		return redirect(url_for('post', id=post.id))
-	form.title.data = post.title
-	form.slug.data = post.slug
-	form.content.data = post.content
-	return render_template('edit_post.html', form=form)
+		return redirect(url_for('post', id=post.id))	
+
+	if current_user.id == post.poster_id:
+		form.title.data = post.title
+		form.slug.data = post.slug
+		form.content.data = post.content
+		return render_template('edit_post.html', form=form)
+	else:
+		flash("You Aren't Authourised To Edit This Post...")
+		posts = Posts.query.order_by(Posts.date_poseted)
+		return render_template("posts.html", posts=posts)
 
 # Add Post Page
 @app.route('/add-post', methods=['GET', 'POST'])
