@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user 
-from webforms import LoginForm, PostForm, PasswordForm, UserForm, PasswordForm, NamerForm
+from webforms import LoginForm, PostForm, PasswordForm, UserForm, PasswordForm, NamerForm, SearchForm
 
 # Create A Flask Instance
 app = Flask(__name__)
@@ -27,6 +27,25 @@ login_manager.login_view = 'login'
 @login_manager.user_loader
 def load_user(user_id):
 	return Users.query.get(int(user_id))
+
+@app.context_processor
+def base():
+	form = SearchForm()
+	return dict(form=form)
+
+@app.route('/search', methods=["POST"])
+def search():
+	form = SearchForm()
+	posts = Posts.query
+	if form.validate_on_submit():
+		post.searched = form.searched.data
+		# Query the Database
+		posts = posts.filter(Posts.content.like('%' + post.searched + '%'))
+		posts = posts.order_by(Posts.title).all()
+		return render_template("search.html",
+			form=form,
+			searched=post.searched,
+			posts=posts)		
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
