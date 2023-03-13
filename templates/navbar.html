@@ -16,8 +16,16 @@
 
         {% if current_user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+          <a class="nav-link" href="{{ url_for('dashboard') }}">
+          Dashboard</a>
         </li>
+
+        {% if current_user.id == 15 %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('admin') }}">
+          Admin</a>
+        </li>
+        {% endif %}
 
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
