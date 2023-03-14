@@ -20,8 +20,11 @@
     {{ current_user.name }}
   </div>
   <div class="card-body">
-    <h5 class="card-title">Welcome to your user dashboard...</h5>
     <p class="card-text">
+
+<div class="container">
+  <div class="row">
+    <div class="col-8">
 	
 	<strong>Name: </strong>{{ current_user.name }}<br/>
 
@@ -41,6 +44,14 @@
     <a href="{{url_for('update', id=current_user.id)}}" class="btn btn-secondary btn-sm">Update Profile</a>
 
     <a href="{{url_for('delete', id=current_user.id)}}" class="btn btn-danger btn-sm">Delete</a>
+    <br/><br/>
+
+		</div>
+		<div class="col-4">
+			<img src="{{ url_for('static', filename='images/default_profile_pic.png') }}" width="200" align="right">
+		</div>
+		</div>
+		</div>
 
 
   </div>
@@ -50,7 +61,7 @@
 
 <div class="card">
   <div class="card-header">
-  	Update Profile 
+  	Update Profile
   </div>
   <div class="card-body">
   	<form action="/dashboard" method="POST">
