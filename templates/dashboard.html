@@ -36,6 +36,8 @@
 
 	<strong>Favourite Colour: </strong>{{ current_user.favourite_colour }}<br/>
 
+	<strong>About Author: </strong>{{ current_user.about_author }}<br/>
+
 	<strong>Date Joined: </strong>{{ current_user.date_added }}<br/>
 
     </p>
@@ -85,6 +87,13 @@
 		{{ form.favourite_color.label(class="form-label") }}
 
 		{{ form.favourite_color(class="form-control", value=name_to_update.favourite_color) }}
+		<br/>
+
+
+		{{ form.about_author.label(class="form-label") }}
+
+		<textarea name="about_author" class="form-control">{{name_to_update.about_author}}
+		</textarea>
 
 
 		<br/>

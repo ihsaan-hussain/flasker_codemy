@@ -19,6 +19,10 @@
 	{{ post.date_poseted }}</small><br/><br/>
 
 	{{ post.content|safe }}<br/><br/>
+
+	{% if post.poster.about_author %}
+		{{ post.poster.about_author }}
+	{% endif %}
 </div>
 
 {% if post.poster_id == current_user.id %}
