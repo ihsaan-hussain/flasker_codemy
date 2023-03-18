@@ -7,6 +7,9 @@ from datetime import date
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user 
 from webforms import LoginForm, PostForm, PasswordForm, UserForm, PasswordForm, NamerForm, SearchForm
 from flask_ckeditor import CKEditor
+from werkzeug.utils import secure_filename
+import uuid as uuid
+import os
 
 # Create A Flask Instance
 app = Flask(__name__)
@@ -20,6 +23,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:2009ih43@localhost
 # Secret Key!
 app.config['SECRET_KEY'] = "1234"
 # Initialize the Database
+
+UPLOAD_FOLDER = 'static/images/'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
@@ -96,8 +103,22 @@ def dashboard():
 		name_to_update.favourite_color = request.form['favourite_color']
 		name_to_update.username = request.form['username']
 		name_to_update.about_author = request.form['about_author']
+		name_to_update.profile_pic = request.files['profile_pic']
+
+
+		# Grab Image Name
+		pic_filename = secure_filename(name_to_update.profile_pic.filename)
+		# Set UUID
+		pic_name = str(uuid.uuid1()) + "_" + pic_filename
+		# Save That Image
+		saver = request.files['profile_pic']
+
+
+		# Change it to a string to save it to a Database
+		name_to_update.profile_pic = pic_name
 		try:
 			db.session.commit()
+			saver.save(os.path.join(app.config['UPLOAD_FOLDER'], pic_name))
 			flash("User Updated Successfully!")
 			return render_template("dashboard.html",
 				form=form,
@@ -217,24 +238,29 @@ def get_current_date():
 	#return {"Date": date.today()}
 
 @app.route('/delete/<int:id>')
+@login_required
 def delete(id):
-	user_to_delete = Users.query.get_or_404(id)
-	name = None
-	form = UserForm()
+	if id == current_user.id:
+		user_to_delete = Users.query.get_or_404(id)
+		name = None
+		form = UserForm()
 
-	try:
-		db.session.delete(user_to_delete)
-		db.session.commit()
-		flash("User Deleted Successfully!!")
-		our_users = Users.query.order_by(Users.date_added)
-		return render_template("add_user.html",
-		form=form,
-		name=name,
-		our_users=our_users)
-	except:
-		flash("Whoops! There was a probelm deleting user, try again...")
-		return render_template("add_user.html",
-		form=form, name=name, our_users=our_users)
+		try:
+			db.session.delete(user_to_delete)
+			db.session.commit()
+			flash("User Deleted Successfully!!")
+			our_users = Users.query.order_by(Users.date_added)
+			return render_template("add_user.html",
+			form=form,
+			name=name,
+			our_users=our_users)
+		except:
+			flash("Whoops! There was a probelm deleting user, try again...")
+			return render_template("add_user.html",
+			form=form, name=name, our_users=our_users)
+	else:
+		flash("Sorry, you can't delete that user!")
+		return redirect(url_for('dashboard'))
 
 app.app_context().push()
 
@@ -401,6 +427,8 @@ class Users(db.Model, UserMixin):
 	favourite_color = db.Column(db.String(120))
 	about_author = db.Column(db.Text(500), nullable=True)
 	date_added = db.Column(db.DateTime, default=datetime.utcnow)
+	profile_pic = db.Column(db.String(500), nullable=True)
+
 	# Do Some Password Stuff
 	password_hash = db.Column(db.String(128))
 	# User Can Have Many Posts
